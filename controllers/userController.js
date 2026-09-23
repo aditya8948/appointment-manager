@@ -1,17 +1,17 @@
-const User = require('../models/User');
+const { User, Booking, Bus } = require('../models');
 
 const addUser = async (req, res) => {
   try {
-    const { username, phone, email } = req.body;
+    const { name, email } = req.body;
 
-    if (!username || !phone || !email) {
+    if (!name || !email) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    const user = await User.create({ username, phone, email });
+    const user = await User.create({ name, email });
     res.status(201).json({
       message: 'User added successfully',
-      id: user.id,
+      user,
     });
   } catch (err) {
     console.error('Error adding user:', err);
@@ -45,4 +45,28 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { addUser, getUsers, deleteUser };
+const getUserBookings = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const bookings = await Booking.findAll({
+      where: { userId: id },
+      include: {
+        model: Bus,
+        attributes: ['busNumber'],
+      },
+    });
+
+    res.status(200).json(bookings);
+  } catch (err) {
+    console.error('Error fetching user bookings:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { addUser, getUsers, deleteUser, getUserBookings };
