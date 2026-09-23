@@ -19,7 +19,7 @@ app.use('/api/bookings', bookingRoutes);
 
 // Also mount at /users, /buses, /bookings (without /api prefix) for Postman convenience
 app.use('/users', userRoutes);
-app.use('/buses', busRoutes);
+app.use('/buses', busRoutes); 
 app.use('/bookings', bookingRoutes);
 
 sequelize.sync().then(() => {
